@@ -1,0 +1,26 @@
+receivers:
+  zipkin:
+  otlp:
+    protocols:
+      grpc:
+      http:
+
+processors:
+  attributes:
+    actions:
+      - key: pat
+        value: test
+        action: insert
+
+exporters:
+  jaeger:
+    endpoint: "jaeger:14250"
+    tls:
+      insecure: true
+
+service:
+  pipelines:
+    traces:
+      receivers: [zipkin, otlp]
+      processors: [attributes]
+      exporters: [jaeger]

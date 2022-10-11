@@ -3,7 +3,7 @@ services:
   collector:
     image: otel/opentelemetry-collector:latest
     volumes:
-      - /Users/dimondp/src/fib/collector/config.yaml:/etc/otelcol/config.yaml
+      - ./collector/config.yaml:/etc/otelcol/config.yaml
     ports:
      - 1888:1888
      - 8888:8888
