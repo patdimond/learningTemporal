@@ -22,5 +22,5 @@ service:
   pipelines:
     traces:
       receivers: [zipkin, otlp]
-      processors: [attributes]
+      processors: []
       exporters: [jaeger]

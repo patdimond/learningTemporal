@@ -10,6 +10,7 @@ import (
 	"go.temporal.io/sdk/contrib/opentelemetry"
 	"go.temporal.io/sdk/interceptor"
 	"go.temporal.io/sdk/worker"
+	"go.temporal.io/sdk/workflow"
 
 	"understandingTemporal/app"
 )
@@ -31,15 +32,25 @@ func main() {
 	}()
 	otel.SetTracerProvider(tp)
 	// Create the client object just once per process
-	c, err := client.NewClient(client.Options{})
+	c, err := client.NewClient(client.Options{ContextPropagators: []workflow.ContextPropagator{app.NewContextPropagator()}})
 	if err != nil {
 		log.Fatalln("unable to create Temporal client", err)
 	}
 	defer c.Close()
-	traceInterceptor, err := opentelemetry.NewTracingInterceptor(opentelemetry.TracerOptions{})
-	// This worker hosts both Workflow and Activity functions
-	w := worker.New(c, app.TaskQueueName, worker.Options{Interceptors: []interceptor.WorkerInterceptor{app.NewWorkerInterceptor(), traceInterceptor}})
+	traceInterceptor, err := opentelemetry.NewTracingInterceptor(
+		opentelemetry.TracerOptions{
+			Tracer:         otel.GetTracerProvider().Tracer("WorkflowWorker"),
+			SpanContextKey: app.CustomContextKey,
+		})
+	// This worker hosts Workflow
+	w := worker.New(c, app.TaskQueueName, worker.Options{
+		Interceptors: []interceptor.WorkerInterceptor{
+			app.NewWorkerInterceptor(),
+			traceInterceptor,
+		},
+	})
 	w.RegisterWorkflow(app.DodgeyWorkflow)
+	w.RegisterActivity(app.GreatSuccess)
 	// Start listening to the Task Queue
 	err = w.Run(worker.InterruptCh())
 	if err != nil {

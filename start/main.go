@@ -5,14 +5,39 @@ import (
 	"fmt"
 	"log"
 
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/sdk/trace"
 	"go.temporal.io/sdk/client"
+	//"go.temporal.io/sdk/interceptor"
+	"go.temporal.io/sdk/workflow"
 
 	"understandingTemporal/app"
 )
 
 func main() {
-	// Create the client object just once per process
-	c, err := client.NewClient(client.Options{})
+	ctx := context.Background()
+	exp, err := app.OtlpExporter("localhost:4317")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	tp := trace.NewTracerProvider(
+		trace.WithBatcher(exp),
+		trace.WithResource(app.NewResource()),
+	)
+	defer func() {
+		if err := tp.Shutdown(ctx); err != nil {
+			log.Fatal(err)
+		}
+	}()
+	otel.SetTracerProvider(tp)
+	tracer := otel.Tracer("workflowStarter")
+
+	ctx, span := tracer.Start(ctx, "Start")
+	defer span.End()
+
+	c, err := client.Dial(client.Options{
+		ContextPropagators: []workflow.ContextPropagator{app.NewContextPropagator()}})
 	if err != nil {
 		log.Fatalln("unable to create Temporal client", err)
 	}
@@ -22,12 +47,12 @@ func main() {
 		TaskQueue: app.TaskQueueName,
 	}
 	name := "World"
-	we, err := c.ExecuteWorkflow(context.Background(), options, app.DodgeyWorkflow, name)
+	we, err := c.ExecuteWorkflow(ctx, options, app.DodgeyWorkflow, name)
 	if err != nil {
 		log.Fatalln("unable to complete Workflow", err)
 	}
 	var greeting string
-	err = we.Get(context.Background(), &greeting)
+	err = we.Get(ctx, &greeting)
 	if err != nil {
 		log.Fatalln("unable to get Workflow result", err)
 	}

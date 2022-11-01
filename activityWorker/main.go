@@ -39,7 +39,7 @@ func main() {
 	defer c.Close()
 
 	traceInterceptor, err := opentelemetry.NewTracingInterceptor(opentelemetry.TracerOptions{})
-	// This worker hosts both Workflow and Activity functions
+	// This worker hosts Activity functions
 	w := worker.New(c, app.TaskQueueName, worker.Options{Interceptors: []interceptor.WorkerInterceptor{app.NewWorkerInterceptor(), traceInterceptor}})
 	w.RegisterActivity(app.GreatSuccess)
 	w.RegisterActivity(app.FiftySuccess)

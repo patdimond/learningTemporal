@@ -18,21 +18,5 @@ func DodgeyWorkflow(ctx workflow.Context, name string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	err = workflow.ExecuteActivity(ctx, FiftySuccess, name).Get(ctx, &result)
-	if err != nil {
-		return "", err
-	}
-	err = workflow.ExecuteActivity(ctx, TwentySuccess, name).Get(ctx, &result)
-	if err != nil {
-		return "", err
-	}
-	err = workflow.ExecuteActivity(ctx, FlipSuccess, name).Get(ctx, &result)
-	if err != nil {
-		return "", err
-	}
-	err = workflow.ExecuteActivity(ctx, UnlikelySuccess, name).Get(ctx, &result)
-	if err != nil {
-		return "", err
-	}
 	return result, err
 }

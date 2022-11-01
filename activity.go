@@ -13,6 +13,7 @@ import (
 func GreatSuccess(ctx context.Context, name string) (string, error) {
 	span := trace.SpanFromContext(ctx)
 	span.SetAttributes(attribute.String("Hello", "team"))
+	span.SetAttributes(attribute.Bool("winning", true))
 	greeting := fmt.Sprintf("Always success %s", name)
 	return greeting, nil
 }
@@ -21,7 +22,7 @@ func FiftySuccess(ctx context.Context, name string) (string, error) {
 	span := trace.SpanFromContext(ctx)
 	span.SetAttributes(attribute.String("Chance", "50"))
 	roll := rand.Intn(10)
-	if roll < 5 {
+	if roll < 8 {
 		greeting := fmt.Sprintf("Fifty success %s", name)
 		return greeting, nil
 	} else {
@@ -34,7 +35,7 @@ func TwentySuccess(ctx context.Context, name string) (string, error) {
 	span := trace.SpanFromContext(ctx)
 	span.SetAttributes(attribute.String("Chance", "20"))
 	roll := rand.Intn(10)
-	if roll < 2 {
+	if roll < 8 {
 		greeting := fmt.Sprintf("Twenty success %s", name)
 		return greeting, nil
 	} else {
@@ -47,7 +48,7 @@ func FlipSuccess(ctx context.Context, name string) (string, error) {
 	span := trace.SpanFromContext(ctx)
 	span.SetAttributes(attribute.String("Chance", "50"))
 	roll := rand.Intn(10)
-	if roll < 5 {
+	if roll < 8 {
 		greeting := fmt.Sprintf("Unlikely success %s", name)
 		return greeting, nil
 	} else {
@@ -60,7 +61,7 @@ func UnlikelySuccess(ctx context.Context, name string) (string, error) {
 	span := trace.SpanFromContext(ctx)
 	span.SetAttributes(attribute.String("Chance", "30"))
 	roll := rand.Intn(10)
-	if roll < 3 {
+	if roll < 8 {
 		greeting := fmt.Sprintf("Unlikely success %s", name)
 		return greeting, nil
 	} else {

@@ -36,7 +36,7 @@ func NewResource() *resource.Resource {
 		resource.Default(),
 		resource.NewWithAttributes(
 			semconv.SchemaURL,
-			semconv.ServiceNameKey.String("WhatIsTemporalEvenDoing"),
+			semconv.ServiceNameKey.String("dimondpTemporalDemo"),
 			semconv.ServiceVersionKey.String("v0.1.0"),
 			attribute.String("environment", "demo"),
 		),
