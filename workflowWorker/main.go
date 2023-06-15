@@ -10,7 +10,7 @@ import (
 	"go.temporal.io/sdk/contrib/opentelemetry"
 	"go.temporal.io/sdk/interceptor"
 	"go.temporal.io/sdk/worker"
-	"go.temporal.io/sdk/workflow"
+	//	"go.temporal.io/sdk/workflow"
 
 	"understandingTemporal/app"
 )
@@ -32,7 +32,7 @@ func main() {
 	}()
 	otel.SetTracerProvider(tp)
 	// Create the client object just once per process
-	c, err := client.NewClient(client.Options{ContextPropagators: []workflow.ContextPropagator{app.NewContextPropagator()}})
+	c, err := client.NewClient(client.Options{})
 	if err != nil {
 		log.Fatalln("unable to create Temporal client", err)
 	}
