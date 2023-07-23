@@ -46,6 +46,7 @@ func FiftySuccess(ctx context.Context, name string) (string, error) {
 		TaskQueue: TaskQueueName,
 	}
 
+	span.AddEvent("Starting new trace with link")
 	link := trace.LinkFromContext(ctx)
 	newTraceCtx, newSpan := otel.Tracer("Driver").Start(context.Background(), "Split", trace.WithLinks(link))
 
@@ -54,6 +55,7 @@ func FiftySuccess(ctx context.Context, name string) (string, error) {
 		log.Fatalln("unable to start worfklow", err)
 	}
 	newSpan.End()
+	span.AddEvent("Ended new trace with link")
 
 	roll := rand.Intn(10)
 	if roll < 8 {
