@@ -8,6 +8,9 @@ import (
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/sdk/trace"
 	"go.temporal.io/sdk/client"
+	"go.temporal.io/sdk/contrib/opentelemetry"
+	"go.temporal.io/sdk/interceptor"
+
 	//"go.temporal.io/sdk/interceptor"
 	//"go.temporal.io/sdk/workflow"
 
@@ -36,7 +39,15 @@ func main() {
 	ctx, span := tracer.Start(ctx, "Start")
 	defer span.End()
 
-	c, err := client.Dial(client.Options{})
+	traceInterceptor, err := opentelemetry.NewTracingInterceptor(
+		opentelemetry.TracerOptions{
+			Tracer:         otel.GetTracerProvider().Tracer("Starter"),
+			SpanContextKey: app.CustomContextKey,
+		})
+
+	c, err := client.Dial(client.Options{
+		Interceptors: []interceptor.ClientInterceptor{traceInterceptor},
+	})
 	if err != nil {
 		log.Fatalln("unable to create Temporal client", err)
 	}
@@ -46,7 +57,7 @@ func main() {
 		TaskQueue: app.TaskQueueName,
 	}
 	name := "World"
-	we, err := c.ExecuteWorkflow(ctx, options, app.DodgeyWorkflow, name)
+	we, err := c.ExecuteWorkflow(ctx, options, app.Baker, name)
 	if err != nil {
 		log.Fatalln("unable to complete Workflow", err)
 	}
