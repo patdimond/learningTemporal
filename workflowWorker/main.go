@@ -49,8 +49,13 @@ func main() {
 			traceInterceptor,
 		},
 	})
-	w.RegisterWorkflow(app.DodgeyWorkflow)
+	w.RegisterWorkflow(app.Baker)
+	w.RegisterWorkflow(app.Driver)
 	w.RegisterActivity(app.GreatSuccess)
+	w.RegisterActivity(app.FiftySuccess)
+	w.RegisterActivity(app.TwentySuccess)
+	w.RegisterActivity(app.FlipSuccess)
+	w.RegisterActivity(app.UnlikelySuccess)
 	// Start listening to the Task Queue
 	err = w.Run(worker.InterruptCh())
 	if err != nil {
